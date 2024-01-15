@@ -4,9 +4,12 @@
 "displayName": "Criaath Tool Package",
 "description": "Basic tools for game development",
 "unity": "2019.4",
+"dependencies": {
+    "com.dbrizov.naughtyattributes" : "https://github.com/dbrizov/NaughtyAttributes.git#upm"
+    },
 "author": {
-"name": "Emrecan Dedeoglu",
-"email": "emrecandedeoglu@gmail.com",
-"url": "",
-}
+    "name": "Emrecan Dedeoglu",
+    "email": "emrecandedeoglu@gmail.com",
+    "url": "",
+    }
 }
