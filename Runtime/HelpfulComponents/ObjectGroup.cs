@@ -1,3 +1,4 @@
+using NaughtyAttributes;
 using UnityEngine;
 
 namespace Criaath.MiniComponents
@@ -7,16 +8,35 @@ namespace Criaath.MiniComponents
     {
         [SerializeField, Range(0f, 1f)] private float _alpha = 1;
         private SpriteRenderer[] _allChildSpriteRenderers;
+        private float[] _initialAlphas;
+
+
+
         private void GetChildSpriteRenderers()
         {
             _allChildSpriteRenderers = transform.GetComponentsInChildren<SpriteRenderer>();
+            _initialAlphas = new float[_allChildSpriteRenderers.Length];
+
+            for (int i = 0; i < _allChildSpriteRenderers.Length; i++)
+            {
+                _initialAlphas[i] = _allChildSpriteRenderers[i].color.a;
+            }
         }
+
+
 #if UNITY_EDITOR
         private void OnValidate()
         {
             if (_allChildSpriteRenderers == null) GetChildSpriteRenderers();
             SetAlpha(_alpha);
         }
+
+        [Button]
+        public void SetAlphaValues()
+        {
+            GetChildSpriteRenderers();
+        }
+
 
 #else
     private void Awake()
@@ -31,18 +51,9 @@ namespace Criaath.MiniComponents
             for (int i = 0; i < _allChildSpriteRenderers.Length; i++)
             {
                 Color color = _allChildSpriteRenderers[i].color;
-                color.a = alpha;
+                color.a = _initialAlphas[i] * alpha;
                 _allChildSpriteRenderers[i].color = color;
             }
-
-            // for itself
-            if (gameObject.TryGetComponent(out SpriteRenderer spriteRenderer))
-            {
-                Color color = spriteRenderer.color;
-                color.a = alpha;
-                spriteRenderer.color = color;
-            }
-
 
             _alpha = alpha;
         }

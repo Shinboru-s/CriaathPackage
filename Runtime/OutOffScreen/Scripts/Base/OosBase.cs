@@ -48,13 +48,7 @@ namespace Criaath.OOS
 
         #endregion
 
-        private void Update()
-        {
-            if (_moveTween == null)
-                Debug.Log("move tween is null");
-            else
-                Debug.Log("there is tween here");
-        }
+
 
         #region Built-in
 
@@ -92,6 +86,11 @@ namespace Criaath.OOS
 
 
         #region Public Funcs
+
+        public float GetTotalTime()
+        {
+            return _travelTime + _delay;
+        }
 
         public void MoveToTarget()
         {

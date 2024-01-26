@@ -4,37 +4,42 @@ namespace Criaath.MiniTools
 {
     public static class CriaathDebugger
     {
-        public static void Log(string message, Color color)
+        public static void Log(object message)
+        {
+            if (!ShouldLog()) return;
+            Debug.Log($"<color=#{ColorUtility.ToHtmlStringRGBA(Color.white)}>{message}</color>");
+        }
+        public static void Log(object message, Color color)
         {
             if (!ShouldLog()) return;
             Debug.Log($"<color=#{ColorUtility.ToHtmlStringRGBA(color)}>{message}</color>");
         }
 
-        public static void Log(string header, Color headerColor, string message, Color messageColor)
+        public static void Log(object header, Color headerColor, object message, Color messageColor)
         {
             if (!ShouldLog()) return;
-            Debug.Log($"<color=#{ColorUtility.ToHtmlStringRGBA(headerColor)}>{header}</color>: <color=#{ColorUtility.ToHtmlStringRGBA(messageColor)}>{message}</color>");
+            Debug.Log($"<color=#{ColorUtility.ToHtmlStringRGBA(headerColor)}>{header}</color>: \n<color=#{ColorUtility.ToHtmlStringRGBA(messageColor)}>{message}</color>");
         }
 
-        public static void LogWarning(string message, Color color)
+        public static void LogWarning(object message, Color color)
         {
             if (!ShouldLog()) return;
             Debug.LogWarning($"<color=#{ColorUtility.ToHtmlStringRGBA(color)}>{message}</color>");
         }
-        public static void LogWarning(string header, Color headerColor, string message, Color messageColor)
+        public static void LogWarning(object header, Color headerColor, object message, Color messageColor)
         {
             if (!ShouldLog()) return;
-            Debug.LogWarning($"<color=#{ColorUtility.ToHtmlStringRGBA(headerColor)}>{header}</color>: <color=#{ColorUtility.ToHtmlStringRGBA(messageColor)}>{message}</color>");
+            Debug.LogWarning($"<color=#{ColorUtility.ToHtmlStringRGBA(headerColor)}>{header}</color>: \n<color=#{ColorUtility.ToHtmlStringRGBA(messageColor)}>{message}</color>");
         }
-        public static void LogError(string message, Color color)
+        public static void LogError(object message, Color color)
         {
             if (!ShouldLog()) return;
             Debug.LogError($"<color=#{ColorUtility.ToHtmlStringRGBA(color)}>{message}</color>");
         }
-        public static void LogError(string header, Color headerColor, string message, Color messageColor)
+        public static void LogError(object header, Color headerColor, object message, Color messageColor)
         {
             if (!ShouldLog()) return;
-            Debug.LogError($"<color=#{ColorUtility.ToHtmlStringRGBA(headerColor)}>{header}</color>: <color=#{ColorUtility.ToHtmlStringRGBA(messageColor)}>{message}</color>");
+            Debug.LogError($"<color=#{ColorUtility.ToHtmlStringRGBA(headerColor)}>{header}</color>: \n<color=#{ColorUtility.ToHtmlStringRGBA(messageColor)}>{message}</color>");
         }
 
 
