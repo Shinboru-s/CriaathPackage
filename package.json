@@ -4,9 +4,6 @@
 "displayName": "Criaath Tool Package",
 "description": "Basic tools for game development",
 "unity": "2019.4",
-"dependencies": {
-    "com.dbrizov.naughtyattributes": "latest"
-    },
 "author": {
     "name": "Emrecan Dedeoglu",
     "email": "emrecandedeoglu@gmail.com",
