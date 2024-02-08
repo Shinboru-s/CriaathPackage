@@ -5,7 +5,7 @@
 "description": "Basic tools for game development",
 "unity": "2019.4",
 "dependencies": {
-    "com.dbrizov.naughtyattributes" : "https://github.com/dbrizov/NaughtyAttributes.git#upm"
+    "com.dbrizov.naughtyattributes": "latest"
     },
 "author": {
     "name": "Emrecan Dedeoglu",
