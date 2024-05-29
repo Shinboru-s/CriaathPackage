@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
+using System.Linq;
 
 namespace Criaath.Extensions
 {
@@ -28,6 +30,18 @@ namespace Criaath.Extensions
             }
 
             return result;
+        }
+
+        public static string ValuesToString<T>(this List<T> list)
+        {
+            StringBuilder str = new StringBuilder();
+            foreach (T value in list)
+            {
+                str.Append(value.ToString());
+                str.Append(" ");
+            }
+
+            return str.ToString();
         }
     }
 }

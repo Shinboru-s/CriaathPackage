@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Text;
 
 namespace Criaath.Extensions
 {
@@ -122,6 +124,16 @@ namespace Criaath.Extensions
             }
 
             return newArray;
+        }
+        public static string ValuesToString<T>(this T[] array)
+        {
+            StringBuilder str = new StringBuilder();
+            foreach (T value in array)
+            {
+                str.Append(value.ToString());
+                str.Append(" ");
+            }
+            return str.ToString();
         }
     }
 }
