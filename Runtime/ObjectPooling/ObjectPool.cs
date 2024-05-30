@@ -78,5 +78,6 @@ namespace Criaath
             Debug.Log("All items pushed to pool.");
         }
         public List<T> GetItemsInUse() { return _poolItemsInUse; }
+        public List<T> GetAllItems() { return _pool; }
     }
 }
