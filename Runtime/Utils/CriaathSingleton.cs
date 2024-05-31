@@ -12,8 +12,8 @@ namespace Criaath.MiniTools
         }
         protected virtual void SetInstance()
         {
-            if (Instance != null) Destroy(Instance.gameObject);
-            Instance = this as T;
+            if (Instance != null) Destroy(this.gameObject);
+            else Instance = this as T;
         }
     }
 }
