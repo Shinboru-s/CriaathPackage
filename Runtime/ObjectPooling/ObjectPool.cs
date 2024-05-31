@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -15,7 +16,8 @@ namespace Criaath
 
         private int _poolSize;
         private int _poolCount = 0;
-        public ObjectPool(GameObject itemPref, Transform poolParent, int defaultSize)
+        public Action<T> OnNewItemSpawn;
+        public ObjectPool(GameObject itemPref, Transform poolParent, int defaultSize, bool autoGeneratePool = true)
         {
             _poolItemPref = itemPref;
             _poolParent = poolParent;
@@ -24,9 +26,10 @@ namespace Criaath
             _pool = new List<T>();
             _poolItemsInUse = new List<T>();
 
-            //if (pushCachedItems) PushCachedItems();
-            FillRemainingItems();
+            if (autoGeneratePool)
+                FillRemainingItems();
         }
+        public void GeneratePool() => FillRemainingItems();
 
         private void FillRemainingItems()
         {
@@ -41,10 +44,12 @@ namespace Criaath
 
         private void SpawnNewItem()
         {
-            var item = Object.Instantiate(_poolItemPref, _poolParent);
+            var item = UnityEngine.Object.Instantiate(_poolItemPref, _poolParent);
             _poolCount++;
             item.name = _poolItemPref.name + _poolCount;
-            PushItem(item.GetComponent<T>(), false);
+            T itemAsT = item.GetComponent<T>();
+            PushItem(itemAsT, false);
+            OnNewItemSpawn?.Invoke(itemAsT);
         }
 
         public void PushItem(T item, bool setParent = true)
