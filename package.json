@@ -8,15 +8,6 @@
     "name": "Emrecan Dedeoglu",
     "email": "emrecandedeoglu@gmail.com"
     },
-    "scopedRegistries": [
-        {
-            "name": "package.openupm.com",
-            "url": "https://package.openupm.com",
-            "scopes": [
-                "com.brunomikoski.animationsequencer"
-            ]
-        }
-    ],
     "dependencies": {
         "com.brunomikoski.animationsequencer": "0.5.4"
     }
