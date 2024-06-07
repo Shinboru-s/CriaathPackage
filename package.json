@@ -7,8 +7,5 @@
 "author": {
     "name": "Emrecan Dedeoglu",
     "email": "emrecandedeoglu@gmail.com"
-    },
-    "dependencies": {
-        "com.brunomikoski.animationsequencer": "0.5.4"
     }
 }
