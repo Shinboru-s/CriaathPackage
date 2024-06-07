@@ -1,0 +1,3 @@
+[submodule "Packages/com.brunomikoski.animationsequencer"]
+	path = Packages/com.brunomikoski.animationsequencer
+	url = https://github.com/brunomikoski/Animation-Sequencer.git
