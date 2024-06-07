@@ -7,9 +7,5 @@
 "author": {
     "name": "Emrecan Dedeoglu",
     "email": "emrecandedeoglu@gmail.com"
-    },
-    "dependencies": 
-    { 
-        "com.dbrizov.naughtyattributes": "https://github.com/dbrizov/NaughtyAttributes/tree/master/Assets/NaughtyAttributes"
     }
 }
