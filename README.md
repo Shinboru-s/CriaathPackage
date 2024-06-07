@@ -11,7 +11,7 @@ Welcome to Criaath Package, your all-in-one solution for Unity projects! This pa
 Criaath Package may require certain dependencies to function properly. To streamline the installation process, we have embedded the necessary dependencies within the package. One of these dependencies is `Naughty Attributes`.
 
 ### About Naughty Attributes
-[Naughty Attributes](https://github.com/dbrizov/NaughtyAttributes). is a powerful Unity extension that enhances the inspector with various attributes and functionalities. This package is integrated seamlessly into Criaath Package to provide additional features and customization options.
+[Naughty Attributes](https://github.com/dbrizov/NaughtyAttributes) is a powerful Unity extension that enhances the inspector with various attributes and functionalities. This package is integrated seamlessly into Criaath Package to provide additional features and customization options.
 
 Note: Criaath Package includes a specific version of Naughty Attributes to ensure compatibility and stability. Modifying or updating Naughty Attributes independently may lead to unexpected behavior.
 
