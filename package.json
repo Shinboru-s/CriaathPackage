@@ -11,6 +11,6 @@
     },
     "dependencies": 
     { 
-        "com.dbrizov.naughtyattributes": "https://github.com/dbrizov/NaughtyAttributes.git"
+        "com.dbrizov.naughtyattributes": "2.1.4"
     }
 }
