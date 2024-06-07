@@ -10,6 +10,6 @@
     },
     "dependencies":
     {
-      "com.brunomikoski.animationsequencer": "0.5.4"
+      "com.brunomikoski.animationsequencer": "https://github.com/brunomikoski/Animation-Sequencer.git"
     }
 }
