@@ -8,5 +8,9 @@
     "name": "Emrecan Dedeoglu",
     "email": "emrecandedeoglu@gmail.com",
     "url": ""
+    },
+    "dependencies": 
+    { 
+        "com.dbrizov.naughtyattributes": "2.1.4"
     }
 }
