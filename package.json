@@ -10,6 +10,6 @@
     },
     "dependencies":
     {
-      "com.brunomikoski.animationsequencer": "https://github.com/brunomikoski/Animation-Sequencer.git"
+      "com.brunomikoski.animationsequencer": "https://github.com/Shinboru-s/CriaathPackage.git#v0.5.4"
     }
 }
