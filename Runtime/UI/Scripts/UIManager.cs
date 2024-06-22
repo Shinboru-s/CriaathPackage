@@ -33,14 +33,14 @@ namespace Criaath.UI
         }
 
         #endregion
-        public void GiveCommand(CommandType commandType, string window, string pageName, bool playAnimations)
+        public void GiveCommand(CommandType commandType, string window, string pageName, bool playAnimations, bool waitForCollaborativePages)
         {
             Window selectedWindow = GetWindow(window);
 
             switch (commandType)
             {
                 case CommandType.Open:
-                    selectedWindow.Open(pageName, playAnimations); break;
+                    selectedWindow.Open(pageName, playAnimations, waitForCollaborativePages); break;
                 case CommandType.OpenAll:
                     selectedWindow.OpenAll(playAnimations); break;
                 case CommandType.Close:

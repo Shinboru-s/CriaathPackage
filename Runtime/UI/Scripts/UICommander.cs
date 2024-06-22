@@ -12,7 +12,7 @@ namespace Criaath.UI
         [SerializeField][BoxGroup("Command Settings")] PlayOnThis _autoCommand;
         [SerializeField][BoxGroup("Command Settings")] CommandType _commandType;
         [SerializeField][BoxGroup("Command Settings")] bool _playAnimations = true;
-        //TODO: Wait for Collaborative pages to close
+        [SerializeField][BoxGroup("Command Settings")] bool _waitForCollaborativePages = true;
         [Space(5)]
         [SerializeField][BoxGroup("Command")][Dropdown("_windowNames")] string _window;
         [SerializeField][BoxGroup("Command")][HideIf("IsPageSelectable")][Dropdown("_pageNames")] string _page;
@@ -69,7 +69,7 @@ namespace Criaath.UI
         [ContextMenu("Give Command")]
         public void GiveCommand()
         {
-            UIManager.Instance.GiveCommand(_commandType, _window, _page, _playAnimations);
+            UIManager.Instance.GiveCommand(_commandType, _window, _page, _playAnimations, _waitForCollaborativePages);
         }
     }
 

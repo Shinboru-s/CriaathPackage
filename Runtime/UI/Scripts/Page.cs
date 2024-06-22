@@ -5,6 +5,7 @@ using NaughtyAttributes;
 using BrunoMikoski.AnimationSequencer;
 using System.Collections.Generic;
 using System;
+using System.Threading.Tasks;
 
 namespace Criaath.UI
 {
@@ -56,7 +57,7 @@ namespace Criaath.UI
             OnCloseEnded.AddListener(() => CriaathDebugger.Log($"{Name}", "Close Ended"));
         }
 
-        public void Open(bool playAnimations, UnityEvent callback = null)
+        public async Task Open(bool playAnimations)
         {
             if (IsOpen == true)
             {
@@ -64,12 +65,18 @@ namespace Criaath.UI
                 return;
             }
 
-            _openAnimation.Play(() => { OnOpenEnded?.Invoke(); callback?.Invoke(); });
+            var tcs = new TaskCompletionSource<bool>();
+            _openAnimation.Play(() => tcs.SetResult(true));
+
             if (playAnimations == false) _openAnimation.Complete();
 
+            await tcs.Task;
+
+            OnOpenEnded?.Invoke();
             IsOpen = true;
         }
-        public void Close(bool playAnimations, UnityEvent callback = null)
+
+        public async Task Close(bool playAnimations)
         {
             if (IsOpen == false)
             {
@@ -77,9 +84,14 @@ namespace Criaath.UI
                 return;
             }
 
-            _closeAnimation.Play(() => { OnCloseEnded?.Invoke(); callback?.Invoke(); });
+            var tcs = new TaskCompletionSource<bool>();
+            _closeAnimation.Play(() => tcs.SetResult(true));
+
             if (playAnimations == false) _closeAnimation.Complete();
 
+            await tcs.Task;
+
+            OnCloseEnded?.Invoke();
             IsOpen = false;
         }
 

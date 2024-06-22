@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Criaath.Extensions;
 using UnityEngine.Events;
+using System.Threading.Tasks;
 
 namespace Criaath.UI
 {
@@ -14,16 +15,13 @@ namespace Criaath.UI
     {
         [ValidateInput("IsNameNullOrEmpty", "Window name cannot be empty!")]
         [SerializeField] string m_name;
-        [SerializeField] GraphicRaycaster _graphicRaycaster; // TODO: use _graphicRaycaster
+        [SerializeField] GraphicRaycaster _graphicRaycaster;
         [SerializeField] Page[] _pages;
         [SerializeField] CollaborativeGroup[] CollaborativePageGroups;
 
         [SerializeField, ReadOnly] private List<Page> _openedPages = new();
 
         [Foldout("Events")] public UnityEvent OnCommandStarted, OnCommandEnded;
-
-        private int _pagesInProcessCount = 0;
-        private bool _allProcessStated = false;
 
         public string Name
         {
@@ -53,23 +51,8 @@ namespace Criaath.UI
         #region Commands
         private void Awake()
         {
-            foreach (var page in _pages)
-            {
-                page.OnOpenStarted.AddListener(() => ProcessPage(+1));
-                page.OnOpenEnded.AddListener(() => ProcessPage(-1));
-                page.OnCloseStarted.AddListener(() => ProcessPage(+1));
-                page.OnCloseEnded.AddListener(() => ProcessPage(-1));
-            }
-        }
-        public void ProcessPage(int state)
-        {
-            return; //! its disabled
-            _pagesInProcessCount += state;
-            if (_pagesInProcessCount == 0 && _allProcessStated)
-            {
-                OnCommandEnded?.Invoke();
-                _allProcessStated = false;
-            }
+            OnCommandStarted.AddListener(() => _graphicRaycaster.enabled = false);
+            OnCommandEnded.AddListener(() => _graphicRaycaster.enabled = true);
         }
         private void OnValidate()
         {
@@ -77,46 +60,66 @@ namespace Criaath.UI
             SetCollaborativeGroupIds();
             _openedPages = _pages.ToList();
         }
-        public void Open(string pageName, bool playAnimations)
+        public async void Open(string pageName, bool playAnimations, bool waitForCollaborativePages)
         {
             OnCommandStarted?.Invoke();
             Page page = GetPage(pageName);
-            page.Open(playAnimations);
-            CloseNonCollaborativePages(page);
+
+
+            if (waitForCollaborativePages)
+            {
+                await CloseNonCollaborativePages(page);
+                await page.Open(playAnimations);
+            }
+            else
+            {
+                Task pageOpenTask = page.Open(playAnimations);
+                Task closeNonCollabTask = CloseNonCollaborativePages(page);
+                await Task.WhenAll(pageOpenTask, closeNonCollabTask);
+            }
+
             _openedPages.Add(page);
+            OnCommandEnded?.Invoke();
         }
-        public void OpenAll(bool playAnimations)
+        public async void OpenAll(bool playAnimations)
         {
             OnCommandStarted?.Invoke();
+            List<Task> pageTasks = new();
 
             foreach (var page in _pages)
             {
                 if (page.IsOpen) continue;
 
-                page.Open(playAnimations);
+                pageTasks.Add(page.Open(playAnimations));
                 _openedPages.Add(page);
             }
-            _allProcessStated = true;
+
+            await Task.WhenAll(pageTasks);
+            OnCommandEnded?.Invoke();
         }
-        public void Close(string pageName, bool playAnimations)
+        public async void Close(string pageName, bool playAnimations)
         {
             OnCommandStarted?.Invoke();
             Page page = GetPage(pageName);
-            page.Close(playAnimations);
+            await page.Close(playAnimations);
             _openedPages.Remove(page);
+            OnCommandEnded?.Invoke();
         }
-        public void CloseAll(bool playAnimations)
+        public async void CloseAll(bool playAnimations)
         {
             OnCommandStarted?.Invoke();
+            List<Task> pageTasks = new();
 
             foreach (var page in _pages)
             {
                 if (page.IsOpen is not true) continue;
 
-                page.Close(playAnimations);
+                pageTasks.Add(page.Close(playAnimations));
                 _openedPages.Remove(page);
             }
-            _allProcessStated = true;
+
+            await Task.WhenAll(pageTasks);
+            OnCommandEnded?.Invoke();
         }
         #endregion
 
@@ -155,13 +158,21 @@ namespace Criaath.UI
                 }
             }
         }
-        private void CloseNonCollaborativePages(Page pageToOpen)
+        private async Task CloseNonCollaborativePages(Page pageToOpen)
         {
-            foreach (var page in _openedPages)
+            List<Task> closeTasks = new List<Task>();
+
+            Page[] tempOpenedPages = _openedPages.ToArray();
+            foreach (var page in tempOpenedPages)
             {
                 if (page.IsCollaborative(pageToOpen) is not true)
-                    page.Close(true);
+                {
+                    closeTasks.Add(page.Close(true));
+                    _openedPages.Remove(page);
+                }
             }
+
+            await Task.WhenAll(closeTasks);
         }
     }
 
