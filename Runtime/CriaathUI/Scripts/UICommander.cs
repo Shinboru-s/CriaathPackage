@@ -5,6 +5,7 @@ using UnityEngine.Events;
 
 namespace Criaath.UI
 {
+#if DOTWEEN_ENABLED
     [DefaultExecutionOrder(50)]
     public class UICommander : MonoBehaviour
     {
@@ -72,6 +73,7 @@ namespace Criaath.UI
             UIManager.Instance.GiveCommand(_commandType, _window, _page, _playAnimations, _waitForCollaborativePages);
         }
     }
+#endif
 
     public enum CommandType
     {

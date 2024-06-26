@@ -5,7 +5,8 @@
         "Unity.TextMeshPro",
         "NaughtyAttributes.Core",
         "BrunoMikoski.AnimationSequencer.Editor",
-        "BrunoMikoski.AnimationSequencer"
+        "BrunoMikoski.AnimationSequencer",
+        "DOTween.Modules"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

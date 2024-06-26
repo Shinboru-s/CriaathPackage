@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace Criaath.UI
 {
+#if DOTWEEN_ENABLED
     [DefaultExecutionOrder(10)]
     public class Page : MonoBehaviour
     {
@@ -106,4 +107,5 @@ namespace Criaath.UI
             return false;
         }
     }
+#endif
 }

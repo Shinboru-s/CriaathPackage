@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 
 namespace Criaath.UI
 {
+#if DOTWEEN_ENABLED
     [DefaultExecutionOrder(-20)]
     public class Window : MonoBehaviour
     {
@@ -182,5 +183,5 @@ namespace Criaath.UI
         [DropdownOption("PageNames")]
         public string[] CollaborativePages;
     }
-
+#endif
 }

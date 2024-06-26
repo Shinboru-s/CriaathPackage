@@ -5,6 +5,7 @@ using NaughtyAttributes;
 
 namespace Criaath.UI
 {
+#if DOTWEEN_ENABLED
     public class UIManager : CriaathSingleton<UIManager>
     {
         [SerializeField] Window[] _windows;
@@ -62,4 +63,5 @@ namespace Criaath.UI
         }
 
     }
+#endif
 }
