@@ -1,7 +1,6 @@
-using Criaath;
 using Criaath.AdvState;
 
-namespace Criaath
+namespace Criaath.Entity
 {
     public class EntityState<T, U> : State where T : Entity<U> where U : EntityData
     {
@@ -38,6 +37,5 @@ namespace Criaath
         {
             base.AnimationFinishTrigger();
         }
-
     }
 }
