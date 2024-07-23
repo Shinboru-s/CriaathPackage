@@ -10,7 +10,7 @@ namespace Criaath.AdvState
         public State PreviousState;
         public Action OnStateChanged;
 
-        public void Initialize(State startingState)
+        public virtual void Initialize(State startingState)
         {
             CurrentState = startingState;
             CurrentState.Initialize();
@@ -20,7 +20,7 @@ namespace Criaath.AdvState
         }
 
 
-        public void ChangeState(State newState)
+        public virtual void ChangeState(State newState)
         {
             PreviousState = CurrentState;
             CurrentState = newState;
@@ -33,12 +33,12 @@ namespace Criaath.AdvState
             OnStateChanged?.Invoke();
         }
 
-        void Update()
+        protected virtual void Update()
         {
             if (CurrentState == null) return;
             CurrentState.Do();
         }
-        void FixedUpdate()
+        protected virtual void FixedUpdate()
         {
             if (CurrentState == null) return;
             CurrentState.FixedDo();
