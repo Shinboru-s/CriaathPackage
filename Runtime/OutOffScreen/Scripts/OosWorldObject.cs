@@ -1,10 +1,10 @@
+#if DOTWEEN_ENABLED
 using DG.Tweening;
 using System.Collections;
 using UnityEngine;
 
 namespace Criaath.OOS
 {
-#if DOTWEEN_ENABLED
     public class OosWorldObject : OosBase
     {
         [SerializeField] private Transform _objectToMove;
@@ -39,5 +39,5 @@ namespace Criaath.OOS
             return _objectToMove.position;
         }
     }
-#endif
 }
+#endif

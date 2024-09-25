@@ -1,3 +1,4 @@
+#if DOTWEEN_ENABLED
 using DG.Tweening;
 using NaughtyAttributes;
 using System.Collections;
@@ -6,7 +7,6 @@ using UnityEngine.Events;
 
 namespace Criaath.OOS
 {
-#if DOTWEEN_ENABLED
     public abstract class OosBase : MonoBehaviour
     {
         #region SerializeField Variables
@@ -163,5 +163,5 @@ namespace Criaath.OOS
 
         #endregion
     }
-#endif
 }
+#endif
