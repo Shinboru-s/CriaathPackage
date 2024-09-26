@@ -40,6 +40,10 @@ namespace Criaath.Audio
 
 
         #region Built-in
+        private void Reset()
+        {
+            _audioSource = GetComponent<AudioSource>();
+        }
         private void Awake()
         {
             if (AudioManager.Instance != null)
