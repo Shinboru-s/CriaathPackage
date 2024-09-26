@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using NaughtyAttributes;
 using UnityEngine;
 
 
@@ -8,6 +9,19 @@ namespace Criaath.Audio
     [RequireComponent(typeof(UnityEngine.AudioSource))]
     public class AudioSource : MonoBehaviour
     {
+        [SerializeField] private Criaath.Audio.AudioClip m_AudioClip;
+
+        public AudioClip AudioClip
+        {
+            private set => m_AudioClip = value;
+            get => m_AudioClip;
+        }
+
+        [Tooltip("Play audio in the selected event")]
+        [Foldout("Settings")][SerializeField] private bool _autoPlay = false;
+        [Tooltip("Select which event to play at")]
+        [ShowIf("_autoPlay")][Foldout("Settings")][SerializeField] private PlayOnThis _playOn;
+
         [SerializeField] private UnityEngine.AudioSource _audioSource;
         private AudioType _type;
         public bool IsPlaying { get; private set; }
@@ -16,15 +30,62 @@ namespace Criaath.Audio
         private float _defaultPitch;
         private float _volumeMultiplier = 1;
         private IEnumerator _stopCoroutine;
+        private Coroutine _fadeCoroutine;
 
         public Action OnAudioPlay;
         public Action OnAudioStop;
 
-        void Awake()
+        private Action _autoPlayAction;
+
+
+
+        #region Built-in
+        private void Awake()
         {
             if (AudioManager.Instance != null)
                 AudioManager.Instance.OnVolumeUpdate += CheckVolumeUpdate;
+
+            SetClipSettings(m_AudioClip);
+
+            if (!_autoPlay) return;
+            _autoPlayAction += Play;
+
+            if (_playOn == PlayOnThis.Awake)
+                _autoPlayAction?.Invoke();
         }
+
+        private void OnEnable()
+        {
+            if (_playOn == PlayOnThis.OnEnable)
+                _autoPlayAction?.Invoke();
+        }
+        private void Start()
+        {
+            if (_playOn == PlayOnThis.Start)
+                _autoPlayAction?.Invoke();
+        }
+        private void OnDisable()
+        {
+            if (_playOn == PlayOnThis.OnDisable)
+                _autoPlayAction?.Invoke();
+        }
+        private void OnDestroy()
+        {
+            if (_playOn == PlayOnThis.OnDestroy)
+                _autoPlayAction?.Invoke();
+
+            OnAudioStop -= () => AudioManager.Instance.StopAudioSource(this);
+            AudioManager.Instance.OnVolumeUpdate -= CheckVolumeUpdate;
+        }
+        #endregion
+
+        public void SetClip(AudioClip clip)
+        {
+            AudioClip = clip;
+            SetClipSettings(m_AudioClip);
+
+        }
+
         public void SetClipSettings(AudioClip audioClip)
         {
             _audioSource.clip = audioClip.Clip;
@@ -101,15 +162,72 @@ namespace Criaath.Audio
             _audioSource.UnPause();
             IsPaused = false;
         }
-        public void SetRandomPitch(float range)
+        public void ResumeOrPlay()
         {
-            float pitch = _defaultPitch;
-            _audioSource.pitch = UnityEngine.Random.Range(pitch - range, pitch + range);
+            if (IsPaused) Resume();
+            else Play();
+        }
+        public void FadeIn(float duration, bool tryResume = false)
+        {
+            StopFadeCoroutine();
+            _fadeCoroutine = StartCoroutine(FadeAudioIn(duration, tryResume));
+        }
+        public void FadeOut(float duration, bool pauseOnEnd = false)
+        {
+            StopFadeCoroutine();
+            if (IsPlaying)
+                _fadeCoroutine = StartCoroutine(FadeAudioOut(duration, pauseOnEnd));
+        }
+        private void StopFadeCoroutine()
+        {
+            if (_fadeCoroutine != null)
+                StopCoroutine(_fadeCoroutine);
+        }
+        private IEnumerator FadeAudioIn(float duration, bool tryResume, float startVolume = 0f)
+        {
+            float endVolume = _defaultVolume * _volumeMultiplier;
+            _audioSource.volume = startVolume;
+
+            if (tryResume)
+                ResumeOrPlay();
+            else
+                Play();
+
+            while (_audioSource.volume < endVolume)
+            {
+                _audioSource.volume += Time.deltaTime / duration;
+                yield return null;
+            }
+
+            _audioSource.volume = endVolume;
+        }
+
+        private IEnumerator FadeAudioOut(float duration, bool pauseOnEnd)
+        {
+            float startVolume = _audioSource.volume;
+
+            while (_audioSource.volume > 0f)
+            {
+                _audioSource.volume -= startVolume * Time.deltaTime / duration;
+                yield return null;
+            }
+
+            if (pauseOnEnd)
+                Pause();
+            else
+                Stop();
+
+            _audioSource.volume = startVolume;
         }
         public void PlayRandomPitch(float range)
         {
             SetRandomPitch(range);
             Play();
+        }
+        public void SetRandomPitch(float range)
+        {
+            float pitch = _defaultPitch;
+            _audioSource.pitch = UnityEngine.Random.Range(pitch - range, pitch + range);
         }
 
         public void ManagerInitialize()
@@ -122,10 +240,6 @@ namespace Criaath.Audio
             yield return new WaitUntil(() => !_audioSource.isPlaying && !IsPaused);
             Stop();
         }
-        private void OnDestroy()
-        {
-            OnAudioStop -= () => AudioManager.Instance.StopAudioSource(this);
-            AudioManager.Instance.OnVolumeUpdate -= CheckVolumeUpdate;
-        }
+
     }
 }

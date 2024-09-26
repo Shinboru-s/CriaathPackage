@@ -36,24 +36,25 @@ namespace Criaath.Audio
             audioSource.ManagerInitialize();
         }
 
-        public void Play(UnityEngine.AudioClip audioClip)
+        public AudioSource Play(UnityEngine.AudioClip audioClip)
         {
-            if (audioClip == null) return;
+            if (audioClip == null) return null;
 
             AudioSource audioSource = PrepareAudioSource();
             audioSource.SetClipSettings(audioClip);
 
             StartAudio(audioSource);
+            return audioSource;
         }
-        public void Play(AudioClip audioClip)
+        public AudioSource Play(AudioClip audioClip)
         {
-            if (audioClip == null) return;
-            if (audioClip.Clip == null) return;
+            if (audioClip == null || audioClip.Clip == null) return null;
 
             AudioSource audioSource = PrepareAudioSource();
             audioSource.SetClipSettings(audioClip);
 
             StartAudio(audioSource);
+            return audioSource;
         }
 
         private void StartAudio(AudioSource audioSource)
