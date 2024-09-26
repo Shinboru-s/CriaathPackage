@@ -92,6 +92,8 @@ namespace Criaath.Audio
 
         public void SetClipSettings(AudioClip audioClip)
         {
+            if (audioClip == null) return;
+
             _audioSource.clip = audioClip.Clip;
             _audioSource.pitch = audioClip.Pitch;
             _audioSource.loop = audioClip.Loop;
