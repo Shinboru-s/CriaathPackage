@@ -7,7 +7,7 @@ using UnityEngine;
 namespace Criaath.Audio
 {
     [RequireComponent(typeof(UnityEngine.AudioSource))]
-    public class AudioSource : MonoBehaviour
+    public class AudioPlayer : MonoBehaviour
     {
         [SerializeField] private Criaath.Audio.AudioClip m_AudioClip;
 

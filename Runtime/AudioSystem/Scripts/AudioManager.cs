@@ -9,7 +9,7 @@ namespace Criaath.Audio
     [DefaultExecutionOrder(-5)]
     public class AudioManager : CriaathSingleton<AudioManager>
     {
-        [Foldout("Pool Settings")][SerializeField] private GameObject _audioSourcePrefab;
+        [Foldout("Pool Settings")][SerializeField] private GameObject _audioPlayerPrefab;
         [Foldout("Pool Settings")][SerializeField] private int _defaultPoolSize = 10;
 
         [OnValueChanged("SetVolume")]
@@ -20,59 +20,67 @@ namespace Criaath.Audio
         [Foldout("Volume Settings")]
         [SerializeField][Range(0, 1)] private float _musicVolume = 0.5f;
 
-        private ObjectPool<AudioSource> _audioSourcePool;
-        private List<AudioSource> _audioSourcesInUse = new();
+        private ObjectPool<AudioPlayer> _audioSourcePool;
+        private List<AudioPlayer> _audioSourcesInUse = new();
 
+        void Reset()
+        {
+            if (_audioPlayerPrefab == null)
+            {
+                _audioPlayerPrefab = Resources.Load<GameObject>("Prefabs/pref_CriaathAudioPlayer");
+                CriaathDebugger.Log("AudioManager", "Audio Player Prefab sets automatically.");
+            }
+        }
         new void Awake()
         {
             base.Awake();
             DontDestroyOnLoad(gameObject);
-            _audioSourcePool = new ObjectPool<AudioSource>(_audioSourcePrefab, transform, _defaultPoolSize, false);
+            _audioSourcePool = new ObjectPool<AudioPlayer>(_audioPlayerPrefab, transform, _defaultPoolSize, false);
             _audioSourcePool.OnNewItemSpawn += Test;
             _audioSourcePool.GeneratePool();
         }
-        private void Test(AudioSource audioSource)
+        private void Test(AudioPlayer audioSource)
         {
             audioSource.ManagerInitialize();
         }
 
-        public AudioSource Play(UnityEngine.AudioClip audioClip)
+        public AudioPlayer Play(UnityEngine.AudioClip audioClip)
         {
             if (audioClip == null) return null;
 
-            AudioSource audioSource = PrepareAudioSource();
+            AudioPlayer audioSource = PrepareAudioSource();
             audioSource.SetClipSettings(audioClip);
 
             StartAudio(audioSource);
             return audioSource;
         }
-        public AudioSource Play(AudioClip audioClip)
+        public AudioPlayer Play(AudioClip audioClip)
         {
             if (audioClip == null || audioClip.Clip == null) return null;
 
-            AudioSource audioSource = PrepareAudioSource();
+            AudioPlayer audioSource = PrepareAudioSource();
             audioSource.SetClipSettings(audioClip);
 
             StartAudio(audioSource);
             return audioSource;
         }
 
-        private void StartAudio(AudioSource audioSource)
+        private void StartAudio(AudioPlayer audioSource)
         {
             UpdateSourceVolume(audioSource);
             audioSource.Play();
             _audioSourcesInUse.Add(audioSource);
         }
 
-        private AudioSource PrepareAudioSource()
+        private AudioPlayer PrepareAudioSource()
         {
-            AudioSource audioSource = _audioSourcePool.Pull();
+            AudioPlayer audioSource = _audioSourcePool.Pull();
             audioSource.gameObject.SetActive(true);
 
             return audioSource;
         }
 
-        public void StopAudioSource(AudioSource audioSource)
+        public void StopAudioSource(AudioPlayer audioSource)
         {
             if (_audioSourcesInUse.Contains(audioSource) is not true) return;
 
@@ -103,7 +111,7 @@ namespace Criaath.Audio
             OnVolumeUpdate?.Invoke(type, volume);
         }
 
-        public void UpdateSourceVolume(AudioSource source)
+        public void UpdateSourceVolume(AudioPlayer source)
         {
             if (source.CheckType(AudioType.Music))
                 source.SetVolume(_musicVolume);
