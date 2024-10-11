@@ -8,14 +8,14 @@ namespace Criaath.AdvState
     {
         public State CurrentState;
         public State PreviousState;
-        public Action OnStateChanged;
+        public Action<State> OnStateChanged;
 
         public virtual void Initialize(State startingState)
         {
             CurrentState = startingState;
             CurrentState.Initialize();
             CurrentState.Enter();
-            OnStateChanged?.Invoke();
+            OnStateChanged?.Invoke(CurrentState);
             CriaathDebugger.Log("State Machine", Color.magenta, $"Current state is {CurrentState.GetType()}", Color.white);
         }
 
@@ -30,7 +30,7 @@ namespace Criaath.AdvState
             CurrentState.Enter();
 
             CriaathDebugger.Log("State Machine", Color.magenta, $"Current state is {CurrentState.GetType()}", Color.white);
-            OnStateChanged?.Invoke();
+            OnStateChanged?.Invoke(CurrentState);
         }
 
         protected virtual void Update()
