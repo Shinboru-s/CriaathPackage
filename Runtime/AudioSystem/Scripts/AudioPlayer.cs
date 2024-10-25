@@ -9,7 +9,7 @@ namespace Criaath.Audio
     [RequireComponent(typeof(UnityEngine.AudioSource))]
     public class AudioPlayer : MonoBehaviour
     {
-        public uint Id { get; set; }
+        [ReadOnly] public uint Id;
         [SerializeField] private Criaath.Audio.AudioClip m_AudioClip;
 
         public AudioClip AudioClip
