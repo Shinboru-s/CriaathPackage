@@ -52,13 +52,6 @@ namespace Criaath.Audio
             _audioPlayerPool.PushItem(audioPlayer);
         }
 
-        private void StartAudio(AudioPlayer audioPlayer)
-        {
-            UpdatePlayerVolume(audioPlayer);
-            audioPlayer.Play();
-            _audioPlayersInUse.Add(audioPlayer);
-        }
-
         private AudioPlayer PrepareAudioPlayer(Criaath.Audio.AudioClip clip)
         {
             if (clip == null || clip.Clip == null)
@@ -71,6 +64,8 @@ namespace Criaath.Audio
             audioPlayer.gameObject.SetActive(true);
             audioPlayer.SetClipSettings(clip);
             audioPlayer.Id = GetNextPlayerId();
+            UpdatePlayerVolume(audioPlayer);
+            _audioPlayersInUse.Add(audioPlayer);
             return audioPlayer;
         }
 
@@ -118,7 +113,7 @@ namespace Criaath.Audio
         public uint Play(Criaath.Audio.AudioClip audioClip)
         {
             AudioPlayer audioPlayer = PrepareAudioPlayer(audioClip);
-            StartAudio(audioPlayer);
+            audioPlayer.Play();
 
             return audioPlayer.Id;
         }
