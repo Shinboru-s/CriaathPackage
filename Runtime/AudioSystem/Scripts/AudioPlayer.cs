@@ -9,6 +9,7 @@ namespace Criaath.Audio
     [RequireComponent(typeof(UnityEngine.AudioSource))]
     public class AudioPlayer : MonoBehaviour
     {
+        public uint Id { get; set; }
         [SerializeField] private Criaath.Audio.AudioClip m_AudioClip;
 
         public AudioClip AudioClip
@@ -22,7 +23,7 @@ namespace Criaath.Audio
         [Tooltip("Select which event to play at")]
         [ShowIf("_autoPlay")][Foldout("Settings")][SerializeField] private PlayOnThis _playOn;
 
-        [SerializeField] private UnityEngine.AudioSource _audioSource;
+        [SerializeField] private AudioSource _audioSource;
         private AudioType _type;
         public bool IsPlaying { get; private set; }
         public bool IsPaused { get; private set; }
@@ -78,7 +79,6 @@ namespace Criaath.Audio
             if (_playOn == PlayOnThis.OnDestroy)
                 _autoPlayAction?.Invoke();
 
-            OnAudioStop -= () => AudioManager.Instance.StopAudioSource(this);
             AudioManager.Instance.OnVolumeUpdate -= CheckVolumeUpdate;
         }
         #endregion
@@ -234,11 +234,6 @@ namespace Criaath.Audio
         {
             float pitch = _defaultPitch;
             _audioSource.pitch = UnityEngine.Random.Range(pitch - range, pitch + range);
-        }
-
-        public void ManagerInitialize()
-        {
-            OnAudioStop += () => AudioManager.Instance.StopAudioSource(this);
         }
 
         private IEnumerator CheckAudioFinished()

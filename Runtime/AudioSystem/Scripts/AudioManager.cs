@@ -20,8 +20,9 @@ namespace Criaath.Audio
         [Foldout("Volume Settings")]
         [SerializeField][Range(0, 1)] private float _musicVolume = 0.5f;
 
-        private ObjectPool<AudioPlayer> _audioSourcePool;
-        private List<AudioPlayer> _audioSourcesInUse = new();
+        private ObjectPool<AudioPlayer> _audioPlayerPool;
+        private List<AudioPlayer> _audioPlayersInUse = new();
+        private uint _nextUsablePlayerId = 0;
 
         void Reset()
         {
@@ -35,57 +36,42 @@ namespace Criaath.Audio
         {
             base.Awake();
             DontDestroyOnLoad(gameObject);
-            _audioSourcePool = new ObjectPool<AudioPlayer>(_audioPlayerPrefab, transform, _defaultPoolSize, false);
-            _audioSourcePool.OnNewItemSpawn += Test;
-            _audioSourcePool.GeneratePool();
+            _audioPlayerPool = new ObjectPool<AudioPlayer>(_audioPlayerPrefab, transform, _defaultPoolSize, false);
+            _audioPlayerPool.OnNewItemSpawn += InitializeOnSpawn;
+            _audioPlayerPool.GeneratePool();
         }
-        private void Test(AudioPlayer audioSource)
+        private void InitializeOnSpawn(AudioPlayer audioPlayer)
         {
-            audioSource.ManagerInitialize();
+            audioPlayer.OnAudioStop += () => StopAudioPlayer(audioPlayer);
         }
-
-        public AudioPlayer Play(UnityEngine.AudioClip audioClip)
+        private void StopAudioPlayer(AudioPlayer audioPlayer)
         {
-            if (audioClip == null) return null;
+            if (_audioPlayersInUse.Contains(audioPlayer) is not true) return;
 
-            AudioPlayer audioSource = PrepareAudioSource();
-            audioSource.SetClipSettings(audioClip);
-
-            StartAudio(audioSource);
-            return audioSource;
-        }
-        public AudioPlayer Play(AudioClip audioClip)
-        {
-            if (audioClip == null || audioClip.Clip == null) return null;
-
-            AudioPlayer audioSource = PrepareAudioSource();
-            audioSource.SetClipSettings(audioClip);
-
-            StartAudio(audioSource);
-            return audioSource;
+            _audioPlayersInUse.Remove(audioPlayer);
+            _audioPlayerPool.PushItem(audioPlayer);
         }
 
-        private void StartAudio(AudioPlayer audioSource)
+        private void StartAudio(AudioPlayer audioPlayer)
         {
-            UpdateSourceVolume(audioSource);
-            audioSource.Play();
-            _audioSourcesInUse.Add(audioSource);
+            UpdatePlayerVolume(audioPlayer);
+            audioPlayer.Play();
+            _audioPlayersInUse.Add(audioPlayer);
         }
 
-        private AudioPlayer PrepareAudioSource()
+        private AudioPlayer PrepareAudioPlayer(Criaath.Audio.AudioClip clip)
         {
-            AudioPlayer audioSource = _audioSourcePool.Pull();
-            audioSource.gameObject.SetActive(true);
+            if (clip == null || clip.Clip == null)
+            {
+                CriaathDebugger.LogError("AudioManager", Color.yellow, "AudioClip or Clip is null! It cannot playable!");
+                return null;
+            }
 
-            return audioSource;
-        }
-
-        public void StopAudioSource(AudioPlayer audioSource)
-        {
-            if (_audioSourcesInUse.Contains(audioSource) is not true) return;
-
-            _audioSourcesInUse.Remove(audioSource);
-            _audioSourcePool.PushItem(audioSource);
+            AudioPlayer audioPlayer = _audioPlayerPool.Pull();
+            audioPlayer.gameObject.SetActive(true);
+            audioPlayer.SetClipSettings(clip);
+            audioPlayer.Id = GetNextPlayerId();
+            return audioPlayer;
         }
 
         private void SetVolume()
@@ -103,20 +89,20 @@ namespace Criaath.Audio
             else if (type == AudioType.SFX)
                 _sfxVolume = volume;
 
-            foreach (var audioSource in _audioSourcesInUse)
+            foreach (var audioPlayer in _audioPlayersInUse)
             {
-                if (audioSource.CheckType(type))
-                    audioSource.SetVolume(volume);
+                if (audioPlayer.CheckType(type))
+                    audioPlayer.SetVolume(volume);
             }
             OnVolumeUpdate?.Invoke(type, volume);
         }
 
-        public void UpdateSourceVolume(AudioPlayer source)
+        public void UpdatePlayerVolume(AudioPlayer player)
         {
-            if (source.CheckType(AudioType.Music))
-                source.SetVolume(_musicVolume);
+            if (player.CheckType(AudioType.Music))
+                player.SetVolume(_musicVolume);
             else
-                source.SetVolume(_sfxVolume);
+                player.SetVolume(_sfxVolume);
         }
         public float GetVolume(AudioType type)
         {
@@ -126,6 +112,69 @@ namespace Criaath.Audio
                 return _sfxVolume;
             else
                 return 1;
+        }
+
+        #region Player Functions
+        public uint Play(Criaath.Audio.AudioClip audioClip)
+        {
+            AudioPlayer audioPlayer = PrepareAudioPlayer(audioClip);
+            StartAudio(audioPlayer);
+
+            return audioPlayer.Id;
+        }
+        public void Stop(uint playerId)
+        {
+            AudioPlayer audioPlayer = GetPlayerWithId(playerId);
+            audioPlayer.Stop();
+        }
+        public void Pause(uint playerId)
+        {
+            AudioPlayer audioPlayer = GetPlayerWithId(playerId);
+            audioPlayer.Pause();
+        }
+        public void Resume(uint playerId)
+        {
+            AudioPlayer audioPlayer = GetPlayerWithId(playerId);
+            audioPlayer.Resume();
+        }
+        public uint FadeIn(Criaath.Audio.AudioClip audioClip, float fadeDuration)
+        {
+            AudioPlayer audioPlayer = PrepareAudioPlayer(audioClip);
+            audioPlayer.FadeIn(fadeDuration);
+
+            return audioPlayer.Id;
+        }
+        public void FadeOut(uint playerId, float fadeDuration)
+        {
+            AudioPlayer audioPlayer = GetPlayerWithId(playerId);
+            audioPlayer.FadeOut(fadeDuration);
+        }
+        public uint PlayRandomPitch(Criaath.Audio.AudioClip audioClip, float range)
+        {
+            AudioPlayer audioPlayer = PrepareAudioPlayer(audioClip);
+
+            audioPlayer.PlayRandomPitch(range);
+            return audioPlayer.Id;
+        }
+        public void SetRandomPitch(uint playerId, float range)
+        {
+            AudioPlayer audioPlayer = GetPlayerWithId(playerId);
+            audioPlayer.PlayRandomPitch(range);
+        }
+        #endregion
+        private uint GetNextPlayerId()
+        {
+            return ++_nextUsablePlayerId;
+        }
+        private AudioPlayer GetPlayerWithId(uint playerId)
+        {
+            foreach (AudioPlayer player in _audioPlayersInUse)
+            {
+                if (player.Id == playerId)
+                    return player;
+            }
+            CriaathDebugger.LogWarning("AudioManager", Color.yellow, $"Audio Player with {playerId} id not found. It may already stopped or never played!");
+            return null;
         }
     }
 }
