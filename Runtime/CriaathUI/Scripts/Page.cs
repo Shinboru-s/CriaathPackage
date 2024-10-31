@@ -25,13 +25,14 @@ namespace Criaath.UI
         public bool IsOpen { get; private set; } = true;
 
         [HideInInspector] public List<int> CollaborativeGroupIds = new();
+        [SerializeField] private bool _logOnCommand = false;
 
         [BoxGroup("Animations"), SerializeField] AnimationSequencerController _openAnimation, _closeAnimation;
         [Foldout("Events")] public UnityEvent OnOpenStarted, OnOpenEnded, OnCloseStarted, OnCloseEnded;
 
         void Awake()
         {
-            AnimationTest();
+            AddLogs();
 
             PrepareEvents();
         }
@@ -49,8 +50,9 @@ namespace Criaath.UI
             OnCloseEnded.AddListener(() => gameObject.SetActive(false));
         }
 
-        void AnimationTest()
+        void AddLogs()
         {
+            if (!_logOnCommand) return;
             OnOpenStarted.AddListener(() => CriaathDebugger.Log($"{Name}", "Open Started"));
             OnOpenEnded.AddListener(() => CriaathDebugger.Log($"{Name}", "Open Ended"));
 
