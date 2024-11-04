@@ -58,6 +58,8 @@ namespace Criaath
             _pool.Add(item);
             item.gameObject.SetActive(false);
             if (setParent) item.transform.SetParent(_poolParent, false);
+            if (_poolItemsInUse.Contains(item))
+                _poolItemsInUse.Remove(item);
         }
 
         public T Pull()
