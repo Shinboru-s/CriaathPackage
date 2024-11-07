@@ -6,7 +6,7 @@
         "NaughtyAttributes.Core",
         "BrunoMikoski.AnimationSequencer.Editor",
         "BrunoMikoski.AnimationSequencer",
-        "DOTween.Modules"
+        "DOTween.Modules",
         "Unity.Netcode.Runtime" 
     ],
     "includePlatforms": [],
