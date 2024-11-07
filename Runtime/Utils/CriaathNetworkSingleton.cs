@@ -1,8 +1,10 @@
+#if NETCODE_ENABLED
 using UnityEngine;
+using Unity.Netcode;
 
 namespace Criaath.MiniTools
 {
-    public class CriaathSingleton<T> : MonoBehaviour where T : MonoBehaviour
+    public class CriaathNetworkSingleton<T> : NetworkBehaviour where T : NetworkBehaviour
     {
         public static T Instance { get; protected set; }
         protected virtual PersistenceOption Persistence => PersistenceOption.None;
@@ -21,9 +23,5 @@ namespace Criaath.MiniTools
             else Instance = this as T;
         }
     }
-    public enum PersistenceOption
-    {
-        None,
-        DontDestroyOnLoad
-    }
 }
+#endif

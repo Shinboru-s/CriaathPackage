@@ -20,6 +20,11 @@
             "name": "com.demigiant.dotween",
             "expression": "",
             "define": "DOTWEEN_ENABLED"
+        },
+         {
+            "name": "com.unity.netcode.gameobjects",
+            "expression": "",
+            "define": "NETCODE_ENABLED"
         }
     ],
     "noEngineReferences": false
