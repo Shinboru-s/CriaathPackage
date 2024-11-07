@@ -7,6 +7,7 @@
         "BrunoMikoski.AnimationSequencer.Editor",
         "BrunoMikoski.AnimationSequencer",
         "DOTween.Modules"
+        "Unity.Netcode.Runtime" 
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
