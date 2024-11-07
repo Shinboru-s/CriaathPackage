@@ -77,9 +77,11 @@ namespace Criaath
         {
             if (_poolItemsInUse.Count == 0) { Debug.Log("There are no items to push!"); return; }
 
-            for (int i = 0; i < _poolItemsInUse.Count; i++)
+            T[] itemsToPush = _poolItemsInUse.ToArray();
+
+            for (int i = 0; i < itemsToPush.Length; i++)
             {
-                PushItem(_poolItemsInUse[i]);
+                PushItem(itemsToPush[i]);
             }
             _poolItemsInUse.Clear();
             Debug.Log("All items pushed to pool.");
