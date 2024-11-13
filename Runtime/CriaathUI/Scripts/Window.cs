@@ -55,6 +55,10 @@ namespace Criaath.UI
             OnCommandStarted.AddListener(() => _graphicRaycaster.enabled = false);
             OnCommandEnded.AddListener(() => _graphicRaycaster.enabled = true);
         }
+        private void Reset() {
+    m_name=gameObject.name;
+    _graphicRaycaster=GetComponent<GraphicRaycaster>();
+}
         private void OnValidate()
         {
             PageNames = GetPageNames();

@@ -29,7 +29,9 @@ namespace Criaath.UI
 
         [BoxGroup("Animations"), SerializeField] AnimationSequencerController _openAnimation, _closeAnimation;
         [Foldout("Events")] public UnityEvent OnOpenStarted, OnOpenEnded, OnCloseStarted, OnCloseEnded;
-
+private void Reset() {
+    m_name=gameObject.name;
+}
         void Awake()
         {
             AddLogs();
