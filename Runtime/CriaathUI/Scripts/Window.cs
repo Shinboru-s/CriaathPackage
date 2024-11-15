@@ -15,27 +15,31 @@ namespace Criaath.UI
     public class Window : MonoBehaviour
     {
         [ValidateInput("IsNameNullOrEmpty", "Window name cannot be empty!")]
-        [SerializeField] string m_name;
-        [SerializeField] GraphicRaycaster _graphicRaycaster;
-        [SerializeField] Page[] _pages;
-        [SerializeField] CollaborativeGroup[] CollaborativePageGroups;
-
-        [SerializeField, ReadOnly] private List<Page> _openedPages = new();
-
-        [Foldout("Events")] public UnityEvent OnCommandStarted, OnCommandEnded;
-
+        [SerializeField, BoxGroup("Settings")] string m_name;
         public string Name
         {
             private set => m_name = value;
             get => m_name;
         }
+        bool IsNameNullOrEmpty(string name) { return !string.IsNullOrEmpty(name); }
+        [SerializeField, BoxGroup("Settings")] GraphicRaycaster _graphicRaycaster;
+        [SerializeField, BoxGroup("Settings")] Page[] _pages;
+        [SerializeField, BoxGroup("Settings")] CollaborativeGroup[] CollaborativePageGroups;
+
+        [Space(5)]
+        [SerializeField, BoxGroup("Initialize")] bool _playAnimOnInitializeOpen = true;
+        [SerializeField, BoxGroup("Initialize")][DropdownOption("_pageNames")] string[] _initializePages;
+
+        [Space(5)]
+        [SerializeField, ReadOnly, BoxGroup("Dev")] private List<Page> _openedPages = new();
+
+
+        [Foldout("Events")] public UnityEvent OnCommandStarted, OnCommandEnded;
+
 
         #region Prepare Page Names
-        bool IsNameNullOrEmpty(string name) { return !string.IsNullOrEmpty(name); }
-
-        [HideInInspector] public string[] PageNames;
-
-        private string[] GetPageNames()
+        private string[] _pageNames;
+        public string[] GetPageNames()
         {
             if (_pages == null || _pages.Length == 0)
                 return new string[] { "Missing Page!" };
@@ -54,16 +58,35 @@ namespace Criaath.UI
         {
             OnCommandStarted.AddListener(() => _graphicRaycaster.enabled = false);
             OnCommandEnded.AddListener(() => _graphicRaycaster.enabled = true);
+            PreparePages();
+            Initialize();
         }
-        private void Reset() {
-    m_name=gameObject.name;
-    _graphicRaycaster=GetComponent<GraphicRaycaster>();
-}
+        private void PreparePages()
+        {
+            foreach (Page page in _pages)
+            {
+                page.PreparePage();
+            }
+        }
+        private void Reset()
+        {
+            m_name = gameObject.name;
+            _graphicRaycaster = GetComponent<GraphicRaycaster>();
+        }
         private void OnValidate()
         {
-            PageNames = GetPageNames();
+            _pageNames = GetPageNames();
             SetCollaborativeGroupIds();
             _openedPages = _pages.ToList();
+        }
+        private async void Initialize()
+        {
+            CloseAll(false);
+            await Task.Delay(1000);
+            foreach (string pageName in _initializePages)
+            {
+                Open(pageName, _playAnimOnInitializeOpen, false);
+            }
         }
         public async void Open(string pageName, bool playAnimations, bool waitForCollaborativePages)
         {
@@ -184,7 +207,7 @@ namespace Criaath.UI
     [System.Serializable]
     public class CollaborativeGroup
     {
-        [DropdownOption("PageNames")]
+        [DropdownOption("_pageNames")]
         public string[] CollaborativePages;
     }
 #endif

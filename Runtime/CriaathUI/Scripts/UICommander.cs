@@ -14,34 +14,24 @@ namespace Criaath.UI
         [SerializeField][BoxGroup("Command Settings")] CommandType _commandType;
         [SerializeField][BoxGroup("Command Settings")] bool _playAnimations = true;
         [SerializeField][BoxGroup("Command Settings")] bool _waitForCollaborativePages = true;
+
         [Space(5)]
-        [SerializeField][BoxGroup("Command")][Dropdown("_windowNames")] string _window;
+        [SerializeField][BoxGroup("Command")] Window _window;
         [SerializeField][BoxGroup("Command")][HideIf("IsPageSelectable")][Dropdown("_pageNames")] string _page;
 
         [Foldout("Events")] public UnityEvent OnCommandStarted, OnCommandEnded;
 
 
         #region Prepare Dropdown Options
-        private string[] _windowNames => GetWindowNames();
-        private string[] GetWindowNames()
-        {
-            UIManager uIManager = FindObjectOfType<UIManager>();
-            if (uIManager == null)
-            {
-                CriaathDebugger.LogError("UIManager missing!", "You need to add a UI Manager to use Criaath UI components.");
-                return null;
-            }
-            if (uIManager != null) return uIManager.WindowNames;
-            return new string[] { "None" };
-        }
 
         private string[] _pageNames => GetPageNames();
         private string[] GetPageNames()
         {
-            UIManager uIManager = FindObjectOfType<UIManager>();
-            return uIManager.GetWindow(_window).PageNames;
+            if (_window == null)
+                return new string[] { "Missing Window!" };
+            return _window.GetPageNames();
         }
-        private bool IsPageSelectable() { return _commandType is CommandType.CloseAll or CommandType.OpenAll; }
+        private bool IsPageSelectable() { return _commandType is CommandType.CloseAll or CommandType.OpenAll || _window == null; }
         #endregion
 
         #region Auto Command
@@ -70,16 +60,27 @@ namespace Criaath.UI
         [ContextMenu("Give Command")]
         public void GiveCommand()
         {
-            UIManager.Instance.GiveCommand(_commandType, _window, _page, _playAnimations, _waitForCollaborativePages);
+            GiveCommand(_commandType, _window, _page, _playAnimations, _waitForCollaborativePages);
+        }
+        private void GiveCommand(CommandType commandType, Window window, string pageName, bool playAnimations, bool waitForCollaborativePages)
+        {
+            switch (commandType)
+            {
+                case CommandType.Open:
+                    window.Open(pageName, playAnimations, waitForCollaborativePages); break;
+                case CommandType.OpenAll:
+                    window.OpenAll(playAnimations); break;
+                case CommandType.Close:
+                    window.Close(pageName, playAnimations); break;
+                case CommandType.CloseAll:
+                    window.CloseAll(playAnimations); break;
+            }
         }
     }
 #endif
 
     public enum CommandType
     {
-        Open,
-        OpenAll,
-        Close,
-        CloseAll
+        Open, OpenAll, Close, CloseAll
     }
 }
