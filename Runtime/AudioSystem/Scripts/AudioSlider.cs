@@ -8,6 +8,10 @@ namespace Criaath.Audio
         [SerializeField] private Slider _slider;
         [SerializeField] private AudioType _type;
 
+        private void Reset()
+        {
+            _slider = GetComponent<Slider>();
+        }
         private void Start()
         {
             _slider.value = AudioManager.Instance.GetVolume(_type);

@@ -81,7 +81,19 @@ namespace Criaath.UI
             OnOpenEnded?.Invoke();
             IsOpen = true;
         }
-
+        // #if UNITY_EDITOR
+        //         [ContextMenu("Run Close Method")]
+        //         public void CloseEditor()
+        //         {
+        //             if (IsOpen == false)
+        //             {
+        //                 CriaathDebugger.LogWarning("Criaath UI", $"{Name} named page already closed!");
+        //                 return;
+        //             }
+        //             _closeAnimation.Play(() => gameObject.SetActive(false));
+        //             IsOpen = false;
+        //         }
+        // #endif
         public async Task Close(bool playAnimations)
         {
             if (IsOpen == false)
@@ -100,7 +112,13 @@ namespace Criaath.UI
             OnCloseEnded?.Invoke();
             IsOpen = false;
         }
-
+        public async Task Toggle(bool playAnimations)
+        {
+            if (IsOpen)
+                await Close(playAnimations);
+            else
+                await Open(playAnimations);
+        }
         public bool IsCollaborative(Page page)
         {
             foreach (var groupId in page.CollaborativeGroupIds)

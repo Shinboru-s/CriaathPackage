@@ -77,7 +77,8 @@ namespace Criaath.UI
         {
             _pageNames = GetPageNames();
             SetCollaborativeGroupIds();
-            _openedPages = _pages.ToList();
+            // _openedPages = _pages.ToList();
+            //CheckInitializePages();
         }
         private async void Initialize()
         {
@@ -149,6 +150,29 @@ namespace Criaath.UI
             await Task.WhenAll(pageTasks);
             OnCommandEnded?.Invoke();
         }
+        public void Toggle(string pageName, bool playAnimations, bool waitForCollaborativePages)
+        {
+            if (GetPage(pageName).IsOpen)
+                Close(pageName, playAnimations);
+            else
+                Open(pageName, playAnimations, waitForCollaborativePages);
+        }
+        private async Task CloseNonCollaborativePages(Page pageToOpen)
+        {
+            List<Task> closeTasks = new List<Task>();
+
+            Page[] tempOpenedPages = _openedPages.ToArray();
+            foreach (var page in tempOpenedPages)
+            {
+                if (page.IsCollaborative(pageToOpen) is not true)
+                {
+                    closeTasks.Add(page.Close(true));
+                    _openedPages.Remove(page);
+                }
+            }
+
+            await Task.WhenAll(closeTasks);
+        }
         #endregion
 
         public Page GetPage(string pageName)
@@ -186,22 +210,40 @@ namespace Criaath.UI
                 }
             }
         }
-        private async Task CloseNonCollaborativePages(Page pageToOpen)
-        {
-            List<Task> closeTasks = new List<Task>();
 
-            Page[] tempOpenedPages = _openedPages.ToArray();
-            foreach (var page in tempOpenedPages)
-            {
-                if (page.IsCollaborative(pageToOpen) is not true)
-                {
-                    closeTasks.Add(page.Close(true));
-                    _openedPages.Remove(page);
-                }
-            }
+        // #if UNITY_EDITOR
+        //         [ContextMenu("Run Close Method")]
+        //         private void RunCloseInEditor()
+        //         {
+        //             Task.Run(() => CheckInitializePages()).ConfigureAwait(false);
+        //         }
+        //         private async void CheckInitializePages()
+        //         {
+        //             _openedPages = new();
+        //             foreach (Page page in _openedPages)
+        //             {
+        //                 if (IsInitializePage(page))
+        //                 {
+        //                     if (page.IsOpen) continue;
 
-            await Task.WhenAll(closeTasks);
-        }
+        //                     await page.Open(false);
+        //                     _openedPages.Add(page);
+        //                 }
+        //                 else
+        //                 {
+        //                     if (!page.IsOpen) continue;
+
+        //                     await page.Close(false);
+        //                     _openedPages.Remove(page);
+        //                 }
+        //             }
+        //         }
+        //         private bool IsInitializePage(Page page)
+        //         {
+        //             return _initializePages.Contains(page.name);
+        //         }
+        // #endif
+
     }
 
     [System.Serializable]

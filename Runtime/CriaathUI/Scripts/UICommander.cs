@@ -74,6 +74,8 @@ namespace Criaath.UI
                     window.Close(pageName, playAnimations); break;
                 case CommandType.CloseAll:
                     window.CloseAll(playAnimations); break;
+                case CommandType.Toggle:
+                    window.Toggle(pageName, playAnimations, waitForCollaborativePages); break;
             }
         }
     }
@@ -81,6 +83,6 @@ namespace Criaath.UI
 
     public enum CommandType
     {
-        Open, OpenAll, Close, CloseAll
+        Open, OpenAll, Close, CloseAll, Toggle
     }
 }
