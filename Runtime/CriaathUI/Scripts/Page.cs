@@ -56,7 +56,7 @@ namespace Criaath.UI
                 return;
             }
             gameObject.SetActive(true);
-            OnOpenStarted?.Invoke();
+            if (invokeEvents) OnOpenStarted?.Invoke();
             var tcs = new TaskCompletionSource<bool>();
             _openAnimation.Play(() => tcs.SetResult(true));
 
@@ -64,7 +64,7 @@ namespace Criaath.UI
 
             await tcs.Task;
 
-            OnOpenEnded?.Invoke();
+            if (invokeEvents) OnOpenEnded?.Invoke();
             IsOpen = true;
         }
         // #if UNITY_EDITOR
@@ -87,7 +87,7 @@ namespace Criaath.UI
                 CriaathDebugger.LogWarning("Criaath UI", $"{Name} named page already closed!");
                 return;
             }
-            OnCloseStarted?.Invoke();
+            if (invokeEvents) OnCloseStarted?.Invoke();
             var tcs = new TaskCompletionSource<bool>();
             _closeAnimation.Play(() => tcs.SetResult(true));
 
@@ -97,7 +97,7 @@ namespace Criaath.UI
 
             IsOpen = false;
             gameObject.SetActive(false);
-            OnCloseEnded?.Invoke();
+            if (invokeEvents) OnCloseEnded?.Invoke();
         }
         public async Task Toggle(bool playAnimations, bool invokeEvents)
         {
