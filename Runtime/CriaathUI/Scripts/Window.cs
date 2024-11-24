@@ -56,13 +56,13 @@ namespace Criaath.UI
         #endregion
 
         #region Commands
-        private void Awake()
+        private async void Awake()
         {
             OnCommandStarted.AddListener(() => _graphicRaycaster.enabled = false);
             OnCommandEnded.AddListener(() => _graphicRaycaster.enabled = true);
             PreparePages();
             if (_initializeOnAwake)
-                Initialize();
+                await Initialize();
         }
         private void PreparePages()
         {
@@ -83,7 +83,7 @@ namespace Criaath.UI
             // _openedPages = _pages.ToList();
             //CheckInitializePages();
         }
-        public async void Initialize()
+        public async Task Initialize()
         {
             await CloseAll(false, _invokeEventsOnInitialize);
             foreach (string pageName in _initializePages)
