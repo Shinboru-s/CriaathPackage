@@ -36,21 +36,6 @@ namespace Criaath.UI
         public void PreparePage()
         {
             AddLogs();
-
-            PrepareEvents();
-        }
-        void PrepareEvents()
-        {
-            // Prepare Open animation events
-            _openAnimation.OnStartEvent.AddListener(() => OnOpenStarted?.Invoke());
-            //_openAnimation.OnFinishedEvent.AddListener(() => OnOpenEnded?.Invoke());
-            // Prepare Close animation events
-            _closeAnimation.OnStartEvent.AddListener(() => OnCloseStarted?.Invoke());
-            //_closeAnimation.OnFinishedEvent.AddListener(() => OnCloseEnded?.Invoke());
-
-            // Prepare page' active state
-            OnOpenStarted.AddListener(() => gameObject.SetActive(true));
-            OnCloseEnded.AddListener(() => gameObject.SetActive(false));
         }
 
         void AddLogs()
@@ -63,14 +48,15 @@ namespace Criaath.UI
             OnCloseEnded.AddListener(() => CriaathDebugger.Log($"{Name}", "Close Ended"));
         }
 
-        public async Task Open(bool playAnimations)
+        public async Task Open(bool playAnimations, bool invokeEvents)
         {
             if (IsOpen == true)
             {
                 CriaathDebugger.LogWarning("Criaath UI", $"{Name} named page already opened!");
                 return;
             }
-
+            gameObject.SetActive(true);
+            OnOpenStarted?.Invoke();
             var tcs = new TaskCompletionSource<bool>();
             _openAnimation.Play(() => tcs.SetResult(true));
 
@@ -94,14 +80,14 @@ namespace Criaath.UI
         //             IsOpen = false;
         //         }
         // #endif
-        public async Task Close(bool playAnimations)
+        public async Task Close(bool playAnimations, bool invokeEvents)
         {
             if (IsOpen == false)
             {
                 CriaathDebugger.LogWarning("Criaath UI", $"{Name} named page already closed!");
                 return;
             }
-
+            OnCloseStarted?.Invoke();
             var tcs = new TaskCompletionSource<bool>();
             _closeAnimation.Play(() => tcs.SetResult(true));
 
@@ -109,15 +95,16 @@ namespace Criaath.UI
 
             await tcs.Task;
 
-            OnCloseEnded?.Invoke();
             IsOpen = false;
+            gameObject.SetActive(false);
+            OnCloseEnded?.Invoke();
         }
-        public async Task Toggle(bool playAnimations)
+        public async Task Toggle(bool playAnimations, bool invokeEvents)
         {
             if (IsOpen)
-                await Close(playAnimations);
+                await Close(playAnimations, invokeEvents);
             else
-                await Open(playAnimations);
+                await Open(playAnimations, invokeEvents);
         }
         public bool IsCollaborative(Page page)
         {

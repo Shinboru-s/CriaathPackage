@@ -13,6 +13,7 @@ namespace Criaath.UI
         [SerializeField][BoxGroup("Command Settings")] PlayOnThis _autoCommand;
         [SerializeField][BoxGroup("Command Settings")] CommandType _commandType;
         [SerializeField][BoxGroup("Command Settings")] bool _playAnimations = true;
+        [SerializeField][BoxGroup("Command Settings")] bool _invokeEvents = true;
         [SerializeField][BoxGroup("Command Settings")] bool _waitForCollaborativePages = true;
 
         [Space(5)]
@@ -60,23 +61,25 @@ namespace Criaath.UI
         [ContextMenu("Give Command")]
         public void GiveCommand()
         {
-            GiveCommand(_commandType, _window, _page, _playAnimations, _waitForCollaborativePages);
+            GiveCommand(_commandType, _window, _page, _playAnimations, _waitForCollaborativePages, _invokeEvents);
         }
-        private void GiveCommand(CommandType commandType, Window window, string pageName, bool playAnimations, bool waitForCollaborativePages)
+        private async void GiveCommand(CommandType commandType, Window window, string pageName, bool playAnimations, bool waitForCollaborativePages, bool invokeEvents)
         {
+            OnCommandStarted?.Invoke();
             switch (commandType)
             {
                 case CommandType.Open:
-                    window.Open(pageName, playAnimations, waitForCollaborativePages); break;
+                    await window.Open(pageName, playAnimations, waitForCollaborativePages, invokeEvents); break;
                 case CommandType.OpenAll:
-                    window.OpenAll(playAnimations); break;
+                    await window.OpenAll(playAnimations, invokeEvents); break;
                 case CommandType.Close:
-                    window.Close(pageName, playAnimations); break;
+                    await window.Close(pageName, playAnimations, invokeEvents); break;
                 case CommandType.CloseAll:
-                    window.CloseAll(playAnimations); break;
+                    await window.CloseAll(playAnimations, invokeEvents); break;
                 case CommandType.Toggle:
-                    window.Toggle(pageName, playAnimations, waitForCollaborativePages); break;
+                    await window.Toggle(pageName, playAnimations, waitForCollaborativePages, invokeEvents); break;
             }
+            OnCommandEnded?.Invoke();
         }
     }
 #endif

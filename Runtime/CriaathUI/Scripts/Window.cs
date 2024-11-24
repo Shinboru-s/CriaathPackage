@@ -27,6 +27,8 @@ namespace Criaath.UI
         [SerializeField, BoxGroup("Settings")] CollaborativeGroup[] CollaborativePageGroups;
 
         [Space(5)]
+        [SerializeField, BoxGroup("Initialize")] bool _initializeOnAwake = true;
+        [SerializeField, BoxGroup("Initialize")] bool _invokeEventsOnInitialize = true;
         [SerializeField, BoxGroup("Initialize")] bool _playAnimOnInitializeOpen = true;
         [SerializeField, BoxGroup("Initialize")][DropdownOption("_pageNames")] string[] _initializePages;
 
@@ -59,7 +61,8 @@ namespace Criaath.UI
             OnCommandStarted.AddListener(() => _graphicRaycaster.enabled = false);
             OnCommandEnded.AddListener(() => _graphicRaycaster.enabled = true);
             PreparePages();
-            Initialize();
+            if (_initializeOnAwake)
+                Initialize();
         }
         private void PreparePages()
         {
@@ -80,16 +83,15 @@ namespace Criaath.UI
             // _openedPages = _pages.ToList();
             //CheckInitializePages();
         }
-        private async void Initialize()
+        public async void Initialize()
         {
-            CloseAll(false);
-            await Task.Delay(1000);
+            await CloseAll(false, _invokeEventsOnInitialize);
             foreach (string pageName in _initializePages)
             {
-                Open(pageName, _playAnimOnInitializeOpen, false);
+                await Open(pageName, _playAnimOnInitializeOpen, false, _invokeEventsOnInitialize);
             }
         }
-        public async void Open(string pageName, bool playAnimations, bool waitForCollaborativePages)
+        public async Task Open(string pageName, bool playAnimations, bool waitForCollaborativePages, bool invokeEvents)
         {
             OnCommandStarted?.Invoke();
             Page page = GetPage(pageName);
@@ -97,20 +99,20 @@ namespace Criaath.UI
 
             if (waitForCollaborativePages)
             {
-                await CloseNonCollaborativePages(page);
-                await page.Open(playAnimations);
+                await CloseNonCollaborativePages(page, invokeEvents);
+                await page.Open(playAnimations, invokeEvents);
             }
             else
             {
-                Task pageOpenTask = page.Open(playAnimations);
-                Task closeNonCollabTask = CloseNonCollaborativePages(page);
+                Task pageOpenTask = page.Open(playAnimations, invokeEvents);
+                Task closeNonCollabTask = CloseNonCollaborativePages(page, invokeEvents);
                 await Task.WhenAll(pageOpenTask, closeNonCollabTask);
             }
 
             _openedPages.Add(page);
             OnCommandEnded?.Invoke();
         }
-        public async void OpenAll(bool playAnimations)
+        public async Task OpenAll(bool playAnimations, bool invokeEvents)
         {
             OnCommandStarted?.Invoke();
             List<Task> pageTasks = new();
@@ -119,22 +121,22 @@ namespace Criaath.UI
             {
                 if (page.IsOpen) continue;
 
-                pageTasks.Add(page.Open(playAnimations));
+                pageTasks.Add(page.Open(playAnimations, invokeEvents));
                 _openedPages.Add(page);
             }
 
             await Task.WhenAll(pageTasks);
             OnCommandEnded?.Invoke();
         }
-        public async void Close(string pageName, bool playAnimations)
+        public async Task Close(string pageName, bool playAnimations, bool invokeEvents)
         {
             OnCommandStarted?.Invoke();
             Page page = GetPage(pageName);
-            await page.Close(playAnimations);
+            await page.Close(playAnimations, invokeEvents);
             _openedPages.Remove(page);
             OnCommandEnded?.Invoke();
         }
-        public async void CloseAll(bool playAnimations)
+        public async Task CloseAll(bool playAnimations, bool invokeEvents)
         {
             OnCommandStarted?.Invoke();
             List<Task> pageTasks = new();
@@ -143,21 +145,21 @@ namespace Criaath.UI
             {
                 if (page.IsOpen is not true) continue;
 
-                pageTasks.Add(page.Close(playAnimations));
+                pageTasks.Add(page.Close(playAnimations, invokeEvents));
                 _openedPages.Remove(page);
             }
 
             await Task.WhenAll(pageTasks);
             OnCommandEnded?.Invoke();
         }
-        public void Toggle(string pageName, bool playAnimations, bool waitForCollaborativePages)
+        public async Task Toggle(string pageName, bool playAnimations, bool waitForCollaborativePages, bool invokeEvents)
         {
             if (GetPage(pageName).IsOpen)
-                Close(pageName, playAnimations);
+                await Close(pageName, playAnimations, invokeEvents);
             else
-                Open(pageName, playAnimations, waitForCollaborativePages);
+                await Open(pageName, playAnimations, waitForCollaborativePages, invokeEvents);
         }
-        private async Task CloseNonCollaborativePages(Page pageToOpen)
+        private async Task CloseNonCollaborativePages(Page pageToOpen, bool invokeEvents)
         {
             List<Task> closeTasks = new List<Task>();
 
@@ -166,7 +168,7 @@ namespace Criaath.UI
             {
                 if (page.IsCollaborative(pageToOpen) is not true)
                 {
-                    closeTasks.Add(page.Close(true));
+                    closeTasks.Add(page.Close(true, invokeEvents));
                     _openedPages.Remove(page);
                 }
             }
