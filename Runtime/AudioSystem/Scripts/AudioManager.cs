@@ -119,18 +119,15 @@ namespace Criaath.Audio
         }
         public void Stop(uint playerId)
         {
-            AudioPlayer audioPlayer = GetPlayerWithId(playerId);
-            audioPlayer.Stop();
+            GetPlayerWithId(playerId)?.Stop();
         }
         public void Pause(uint playerId)
         {
-            AudioPlayer audioPlayer = GetPlayerWithId(playerId);
-            audioPlayer.Pause();
+            GetPlayerWithId(playerId)?.Pause();
         }
         public void Resume(uint playerId)
         {
-            AudioPlayer audioPlayer = GetPlayerWithId(playerId);
-            audioPlayer.Resume();
+            GetPlayerWithId(playerId)?.Resume();
         }
         public uint FadeIn(Criaath.Audio.AudioClip audioClip, float fadeDuration)
         {
@@ -141,8 +138,7 @@ namespace Criaath.Audio
         }
         public void FadeOut(uint playerId, float fadeDuration)
         {
-            AudioPlayer audioPlayer = GetPlayerWithId(playerId);
-            audioPlayer.FadeOut(fadeDuration);
+            GetPlayerWithId(playerId)?.FadeOut(fadeDuration);
         }
         public uint PlayRandomPitch(Criaath.Audio.AudioClip audioClip, float range)
         {
@@ -153,8 +149,7 @@ namespace Criaath.Audio
         }
         public void SetRandomPitch(uint playerId, float range)
         {
-            AudioPlayer audioPlayer = GetPlayerWithId(playerId);
-            audioPlayer.PlayRandomPitch(range);
+            GetPlayerWithId(playerId)?.PlayRandomPitch(range);
         }
         #endregion
         private uint GetNextPlayerId()
@@ -168,7 +163,6 @@ namespace Criaath.Audio
                 if (player.Id == playerId)
                     return player;
             }
-            CriaathDebugger.LogWarning("AudioManager", Color.yellow, $"Audio Player with {playerId} id not found. It may already stopped or never played!");
             return null;
         }
     }
