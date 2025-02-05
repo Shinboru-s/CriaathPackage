@@ -117,7 +117,7 @@ namespace Criaath.Audio
         private void CheckVolumeUpdate(AudioType type, float volume)
         {
             if (CheckType(type))
-                SetVolume(volume);
+                SetVolume(Mathf.Max(volume, 0.0001f));
         }
         public void SetVolume(float volume)
         {
@@ -192,7 +192,7 @@ namespace Criaath.Audio
         private IEnumerator FadeAudioIn(float duration, bool tryResume, float startVolume = 0f)
         {
             float endVolume = _defaultVolume * _volumeMultiplier;
-            _audioSource.volume = startVolume;
+            _audioSource.volume = Mathf.Max(startVolume, 0.0001f);
 
             if (tryResume)
                 ResumeOrPlay();
