@@ -47,7 +47,10 @@ namespace Criaath.UI
             OnCloseStarted.AddListener(() => CriaathDebugger.Log($"{Name}", "Close Started"));
             OnCloseEnded.AddListener(() => CriaathDebugger.Log($"{Name}", "Close Ended"));
         }
-
+        public void Open()
+        {
+            _ = Open(true, true);
+        }
         public async Task Open(bool playAnimations, bool invokeEvents)
         {
             if (IsOpen == true)
@@ -80,6 +83,10 @@ namespace Criaath.UI
         //             IsOpen = false;
         //         }
         // #endif
+        public void Close()
+        {
+            _ = Close(true, true);
+        }
         public async Task Close(bool playAnimations, bool invokeEvents)
         {
             if (IsOpen == false)
