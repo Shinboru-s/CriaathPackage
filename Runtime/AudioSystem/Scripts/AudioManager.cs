@@ -35,8 +35,6 @@ namespace Criaath.Audio
         new void Awake()
         {
             base.Awake();
-            _sfxVolume = PlayerPrefs.GetFloat("CriaathAudioSfxVolume", _sfxVolume);
-            _musicVolume = PlayerPrefs.GetFloat("CriaathAudioMusicVolume", _musicVolume);
             DontDestroyOnLoad(gameObject);
             _audioPlayerPool = new ObjectPool<AudioPlayer>(_audioPlayerPrefab, transform, _defaultPoolSize, false);
             _audioPlayerPool.OnNewItemSpawn += InitializeOnSpawn;
